@@ -45,12 +45,21 @@ server.post('/api/users', (req, res)=>{
     }
 });
 
-server.put('/api/users/:id', async (req, res)=>{
+server.delete('/api/users/:id', (req, res)=>{
     let { id } = req.params;
-    res.json('testing')
+    userModel.remove(id)
+        .then((user) => {
+            if(user === null){
+                res.status(404).json({ message: `The user with the specified ID does not exist` }); 
+                return; 
+            }
+            res.status(200).json(user);
+        }).catch(() => {
+            res.status(500).json({message: "The user could not be removed"});
+        });
 });
 
-server.delete('/api/users/:id', (req, res)=>{
+server.put('/api/users/:id', async (req, res)=>{
     let { id } = req.params;
     res.json('testing')
 });
