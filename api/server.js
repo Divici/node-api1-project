@@ -60,8 +60,26 @@ server.delete('/api/users/:id', (req, res)=>{
 });
 
 server.put('/api/users/:id', async (req, res)=>{
-    let { id } = req.params;
-    res.json('testing')
+    
+    try {
+        let { id } = req.params;
+        const possibleUser = await userModel.findById(id)
+        let userBody = req.body;
+
+        if (!possibleUser) {
+            res.status(404).json({message: "The user with the specified ID does not exist"});
+        }
+        else if (!userBody.name || !userBody.bio) {
+            res.status(400).json({ message: `Please provide name and bio for the user` });
+        } 
+        else {
+            let newUser = await userModel.update(id, userBody);
+            res.status(200).json(newUser);
+        }
+    }
+    catch (err) {
+        res.status(500).json({message: "The user information could not be modified"});
+    }
 });
 
 server.use('*', (req, res) =>{
